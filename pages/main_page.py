@@ -1,9 +1,8 @@
 from .base_page import BasePage
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from locators.main_page_locators import MainPageLocators
 from selenium.webdriver.common.action_chains import ActionChains
-import time
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 class MainPage(BasePage):
     def __init__(self, driver):
@@ -13,28 +12,16 @@ class MainPage(BasePage):
         self.click_element(MainPageLocators.CONSTRUCTOR_BUTTON)
     
     def click_order_feed(self):
-        element = WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable(MainPageLocators.ORDER_FEED_BUTTON)
-        )
-        element.click()
+        self.click_element(MainPageLocators.ORDER_FEED_BUTTON)
     
     def click_personal_account(self):
-        acc = WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable(MainPageLocators.PERSONAL_ACCOUNT_BUTTON)
-        )
-        acc.click()
+        self.click_element(MainPageLocators.PERSONAL_ACCOUNT_BUTTON)
     
     def click_ingredient(self):
-        ingredients = WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable(MainPageLocators.INGREDIENT_ITEM)
-        )
-        ingredients.click()
+        self.click_element(MainPageLocators.INGREDIENT_ITEM)
     
     def close_modal(self):
-        button = WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable(MainPageLocators.MODAL_CLOSE_BUTTON)
-        )
-        button.click()
+        self.click_element(MainPageLocators.MODAL_CLOSE_BUTTON)
     
     def is_modal_visible(self):
         try:
@@ -48,17 +35,14 @@ class MainPage(BasePage):
         return int(counter.text)
     
     def add_ingredients_to_order(self):
-        ingredient = WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable(MainPageLocators.INGREDIENT_ITEM)
-        )
-        
-        constructor = WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located(MainPageLocators.ORDER_PLACE)
-        )
+        ingredient = self.find_element(MainPageLocators.INGREDIENT_ITEM)
+        constructor = self.find_element(MainPageLocators.ORDER_PLACE)
         
         # Прокручиваем к ингредиенту
         self.driver.execute_script("arguments[0].scrollIntoView(true);", ingredient)
-        time.sleep(0.5)
+        # Ждем, пока ингредиент станет видимым после прокрутки
+        self.wait_for_element_visible(MainPageLocators.INGREDIENT_ITEM)
+        
         # Перетаскивание: зажать -> переместить -> отпустить
         actions = ActionChains(self.driver)
         (actions
@@ -71,10 +55,7 @@ class MainPage(BasePage):
          .perform())
     
     def click_order_button(self):
-        button_order = WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable(MainPageLocators.ORDER_BUTTON)
-        )
-        button_order.click()
+        self.click_element(MainPageLocators.ORDER_BUTTON)
     
     def is_order_modal_visible(self):
         try:
@@ -87,7 +68,6 @@ class MainPage(BasePage):
         try:
             # Ждем появления модального окна с номером
             self.wait_for_element_visible(MainPageLocators.ORDER_NUMBER_MODAL, timeout=10)
-            time.sleep(3)
             # Получаем элемент с номером заказа
             number_element = self.find_element(MainPageLocators.ORDER_NUMBER_TEXT)
             order_number = number_element.text.strip()
@@ -96,3 +76,8 @@ class MainPage(BasePage):
         except Exception as e:
             print(f"Не удалось получить номер заказа: {e}")
             return ""
+
+    def wait_for_modal_closed(self, timeout=10):
+        WebDriverWait(self.driver, timeout).until(
+            EC.invisibility_of_element_located(MainPageLocators.MODAL)
+        )

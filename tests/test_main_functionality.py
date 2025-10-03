@@ -1,7 +1,5 @@
-import time
 import allure
 from pages.main_page import MainPage
-from pages.login_page import LoginPage
 
 @allure.feature("Основной функционал")
 class TestMainFunctionality:
@@ -11,7 +9,7 @@ class TestMainFunctionality:
         main_page.go_to_site()
         main_page.click_constructor()
         
-        assert driver.current_url == main_page.base_url + "/"
+        main_page.wait_for_url_to_be(main_page.base_url + "/")
 
     @allure.title("Переход по клику на 'Лента заказов'")
     def test_navigate_to_order_feed(self, driver):
@@ -19,7 +17,7 @@ class TestMainFunctionality:
         main_page.go_to_site()
         main_page.click_order_feed()
         
-        assert "feed" in driver.current_url
+        main_page.wait_for_url_contains("feed")
 
     @allure.title("Клик на ингредиент открывает всплывающее окно с деталями")
     def test_ingredient_modal_opening(self, driver):
@@ -35,7 +33,8 @@ class TestMainFunctionality:
         main_page.go_to_site()
         main_page.click_ingredient()
         main_page.close_modal()
-        time.sleep(2)
+        
+        main_page.wait_for_modal_closed()
         
         assert not main_page.is_modal_visible()
 
@@ -57,6 +56,5 @@ class TestMainFunctionality:
         main_page = MainPage(driver)
         main_page.add_ingredients_to_order()
         main_page.click_order_button()
-        time.sleep(2)
         
         assert main_page.is_order_modal_visible()
