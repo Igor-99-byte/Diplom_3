@@ -1,11 +1,8 @@
 from .base_page import BasePage
 from locators.login_page_locators import LoginPageLocators
-from credentials import URLs
+from urls import URLs
 
 class LoginPage(BasePage):
-    def __init__(self, driver):
-        super().__init__(driver)
-        
     def go_to_login_page(self):
         self.get(URLs.URL_login)
         

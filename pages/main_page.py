@@ -1,13 +1,7 @@
 from .base_page import BasePage
 from locators.main_page_locators import MainPageLocators
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
 
 class MainPage(BasePage):
-    def __init__(self, driver):
-        super().__init__(driver)
-
     def click_constructor(self):
         self.click_element(MainPageLocators.CONSTRUCTOR_BUTTON)
     
@@ -39,12 +33,12 @@ class MainPage(BasePage):
         constructor = self.find_element(MainPageLocators.ORDER_PLACE)
         
         # Прокручиваем к ингредиенту
-        self.driver.execute_script("arguments[0].scrollIntoView(true);", ingredient)
+        self.scroll_to_element(ingredient)
         # Ждем, пока ингредиент станет видимым после прокрутки
         self.wait_for_element_visible(MainPageLocators.INGREDIENT_ITEM)
         
         # Перетаскивание: зажать -> переместить -> отпустить
-        actions = ActionChains(self.driver)
+        actions = self.create_action_chains()
         (actions
          .move_to_element(ingredient)    # Наводим на ингредиент
          .click_and_hold()               # Зажимаем ЛКМ
@@ -78,6 +72,4 @@ class MainPage(BasePage):
             return ""
 
     def wait_for_modal_closed(self, timeout=10):
-        WebDriverWait(self.driver, timeout).until(
-            EC.invisibility_of_element_located(MainPageLocators.MODAL)
-        )
+        self.wait_for_element_invisible(MainPageLocators.MODAL, timeout)

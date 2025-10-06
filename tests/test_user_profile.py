@@ -12,6 +12,8 @@ class TestUserProfile:
         main_page.click_personal_account()
         
         main_page.wait_for_url_contains("account")
+        current_url = main_page.get_current_url()
+        assert "account" in current_url
 
     @allure.title("Переход в раздел 'История заказов'")
     def test_navigate_to_order_history(self, logged_in_user):
@@ -24,6 +26,8 @@ class TestUserProfile:
         profile_page.click_order_history_link()
         
         profile_page.wait_for_url_contains("order-history")
+        current_url = profile_page.get_current_url()
+        assert "order-history" in current_url
 
     @allure.title("Выход из аккаунта")
     def test_logout(self, logged_in_user):
@@ -36,3 +40,5 @@ class TestUserProfile:
         profile_page.click_logout_button()
         
         profile_page.wait_for_url_contains("login")
+        current_url = profile_page.get_current_url()
+        assert "login" in current_url

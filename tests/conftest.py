@@ -1,7 +1,8 @@
 import pytest
-import random
+from user_data import UserData
 import requests
 from selenium import webdriver
+from urls import URLs, EndUrls
 from pages.login_page import LoginPage
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
@@ -24,31 +25,26 @@ def driver(request):
     else:
         raise pytest.UsageError("--browser should be chrome or firefox")
     
-    driver.get("https://stellarburgers.nomoreparties.site")
+    driver.get(URLs.URL_site)
     yield driver
     driver.quit()
 
 @pytest.fixture
 def registered_user():
     """Фикстура для создания пользователя через API"""
-    base_url = "https://stellarburgers.nomoreparties.site/api"
-    email = f"test{random.randint(10000, 99999)}@example.com"
-    password = "password123"
-    name = "Test User"
-    
     # Регистрация пользователя
     response = requests.post(
-        f"{base_url}/auth/register",
-        json={"email": email, "password": password, "name": name}
+        f"{URLs.URL_base_url}{EndUrls.End_url_register}",
+        json={"email": UserData.email, "password": UserData.password, "name": UserData.name}
     )
     token = response.json().get('accessToken')
     
-    yield email, password, name, token
+    yield UserData.email, UserData.password, UserData.name, token
     
     # Удаление пользователя после теста
     if token:
         requests.delete(
-            f"{base_url}/auth/user", 
+            f"{URLs.URL_base_url}{EndUrls.End_url_delete}", 
             headers={'Authorization': token}
         )
 

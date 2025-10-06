@@ -9,9 +9,6 @@ class TestOrderFeed:
     def test_order_modal_opening(self, driver):
         order_feed_page = OrderFeedPage(driver)
         order_feed_page.get(order_feed_page.base_url + "/feed")
-        
-        assert order_feed_page.get_order_count() > 0, "Нет заказов для тестирования модального окна"
-        
         order_feed_page.click_order()
         assert order_feed_page.is_order_modal_visible()
 
@@ -20,7 +17,6 @@ class TestOrderFeed:
         driver, email, password, name, token = logged_in_user
         
         main_page = MainPage(driver)
-        main_page.go_to_site()
         main_page.click_personal_account()
         
         profile_page = ProfilePage(driver)
@@ -40,7 +36,7 @@ class TestOrderFeed:
         order_feed_page.get(order_feed_page.base_url + "/feed")
         initial_total = order_feed_page.get_total_orders_count()
         
-        order_number = order_feed_page.create_order_and_get_number()
+        order_feed_page.create_order_and_get_number()
         
         order_feed_page.get(order_feed_page.base_url + "/feed")
         new_total = order_feed_page.get_total_orders_count()
@@ -55,7 +51,8 @@ class TestOrderFeed:
         order_feed_page.get(order_feed_page.base_url + "/feed")
         initial_today = order_feed_page.get_today_orders_count()
         
-        order_number = order_feed_page.create_order_and_get_number()
+        order_feed_page.create_order_and_get_number()
+
         
         order_feed_page.get(order_feed_page.base_url + "/feed")
         new_today = order_feed_page.get_today_orders_count()
@@ -79,4 +76,4 @@ class TestOrderFeed:
         in_progress_orders = order_feed_page.get_in_progress_orders()
         
         # Проверяем, что номер заказа есть в разделе "В работе"
-        assert f'0{order_number}' in in_progress_orders
+        assert any(f'0{order_number}' in order_text for order_text in in_progress_orders)

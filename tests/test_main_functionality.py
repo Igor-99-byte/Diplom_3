@@ -18,6 +18,8 @@ class TestMainFunctionality:
         main_page.click_order_feed()
         
         main_page.wait_for_url_contains("feed")
+        current_url = main_page.get_current_url()
+        assert "feed" in current_url
 
     @allure.title("Клик на ингредиент открывает всплывающее окно с деталями")
     def test_ingredient_modal_opening(self, driver):
